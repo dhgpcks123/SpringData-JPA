@@ -1,6 +1,8 @@
 package study.datajpa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import study.datajpa.entity.Member;
 
 import java.util.List;
@@ -22,7 +24,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //find...By, findHelloBy() 전체조회!
     List<Member> findHelloBy();
 
-    List<Member> findTop3HelloBy(int no);
+    List<Member> findTop3HelloBy();
     /*
     count...By
     exists...By
@@ -30,4 +32,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     findDestinct, findMemberDistinctBy
     findFirstTop10 등등
      */
+
+    @Query(name = "Member.findByUsername") //NamedQuery.. 굳이 복잡하게 실무에서 써야할 필요가 없는 듯?
+    List<Member> NQfindByUsername(@Param("username") String username);
+//    JPQL에 :username 명확히 작성했을 때 @Param어노테이션 필요하다.
+    //그냥 여기에 JPQL칠 수 있는데 굳이 쪼개서 NamedQuery를 엔티티클래스에 쓸 필요가 없잖아.
 }
