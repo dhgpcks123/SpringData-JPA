@@ -37,4 +37,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Member> NQfindByUsername(@Param("username") String username);
 //    JPQL에 :username 명확히 작성했을 때 @Param어노테이션 필요하다.
     //그냥 여기에 JPQL칠 수 있는데 굳이 쪼개서 NamedQuery를 엔티티클래스에 쓸 필요가 없잖아.
+
+    @Query("select m from Member m where m.username = :username and m.age = :age")
+    List<Member> findUser(@Param("username") String username, @Param("age") int age);
+    //@Query장점! 오타쳤다? 애플리케이션 로딩시점에 오류 발생함! 오 굳 NamedQuery장점 그냥 들고 있으면서
+    //훨씬 간단하네. @Query 이름 없는 NamedQuery라고 생각하면 되겠다
+    // --> 동적 쿼리는 ? QueryDSL을 써야한다.
 }
