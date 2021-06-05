@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
 import java.util.List;
@@ -43,4 +44,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //@Query장점! 오타쳤다? 애플리케이션 로딩시점에 오류 발생함! 오 굳 NamedQuery장점 그냥 들고 있으면서
     //훨씬 간단하네. @Query 이름 없는 NamedQuery라고 생각하면 되겠다
     // --> 동적 쿼리는 ? QueryDSL을 써야한다.
+
+    @Query("select m.username from Member m")
+    List<String> findUsernameList();
+
+    @Query("select new study.datajpa.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
+    List<MemberDto> findMemberDto();
 }
