@@ -158,4 +158,34 @@ public class MemberRepositoryTest {
             System.out.println("member = " + member);
         }
     }
+    @Test
+    public void returnType(){
+        Member m1 = new Member("AAA", 10);
+        Member m2 = new Member("BBB", 20);
+        memberRepository.save(m1);
+        memberRepository.save(m2);
+
+        List<Member> aaa = memberRepository.findListByUsername("AAA");
+        Member aaa1 = memberRepository.findMemberByUsername("AAA");
+        Optional<Member> aaa2 = memberRepository.findOptionalByUsername("AAA");
+        System.out.println("aaa = " + aaa);
+        System.out.println("aaa1 = " + aaa1);
+        System.out.println("aaa2 = " + aaa2);
+
+        //만약 컬렉션 조회했을 때 없으면 emptyCollection을 반환한다.
+        List<Member> result = memberRepository.findListByUsername("asdfgh");
+        System.out.println(">>>>>>result = " + result);
+        //빈 컬렉션을 반환해준다.
+        //if(result != null) 이거 절대 하지 마세요. 그냥 빈 거 반환해줘.
+        //스프링 데이터 JPA의 경우 그냥 try catch해줌
+        //단건인 경우는 결과가가 null 나옴
+        Member resultOne = memberRepository.findMemberByUsername("asdf");
+        System.out.println(">>>>>>resultOne = " + resultOne);
+
+        //이거 자바8나오고 나서 논쟁 없어짐ㅋ
+        //Optional쓰면 되니까. 근데... 회사에선 안 씀 ㅠㅠ
+
+        //한 건 조회하는건데!!!! 결과가 2개 이상이면 어떻게 되냐!? --> 예외터짐!
+        //IncorrectResultSizeException
+    }
 }

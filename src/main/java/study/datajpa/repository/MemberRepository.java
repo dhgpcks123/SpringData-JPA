@@ -8,6 +8,7 @@ import study.datajpa.entity.Member;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 //@Repository //어노테이션 생략해도 됨!
 //왜냐면! 스프링 데이터 JPA가 인터페이스만 보고 인식해줌
@@ -54,4 +55,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("select m from Member m where m.username in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
+
+    List<Member> findListByUsername(String username); //컬렉션
+    Member findMemberByUsername(String username); //단건
+    Optional<Member> findOptionalByUsername(String username); //단건 Optional
+    //반환 타입을 유연하게 쓸 수 있도록 스프링 데이터 JPA가 지원해준다
 }
