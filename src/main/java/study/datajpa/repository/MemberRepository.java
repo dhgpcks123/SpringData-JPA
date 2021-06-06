@@ -2,6 +2,7 @@ package study.datajpa.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -64,4 +65,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     //반환 타입을 유연하게 쓸 수 있도록 스프링 데이터 JPA가 지원해준다
 
     Page<Member> findByAge(int age, Pageable pageable);
+
+    Slice<Member> findSliceByAge(int age, Pageable pageable);
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
@@ -221,6 +222,35 @@ public class MemberRepositoryTest {
         Assertions.assertThat(page.getTotalElements()).isEqualTo(5);
         Assertions.assertThat(page.getNumber()).isEqualTo(0);//페이지 번호 가져옴!
         Assertions.assertThat(page.getTotalPages()).isEqualTo(2);
+        Assertions.assertThat(page.isFirst()).isTrue();
+        Assertions.assertThat(page.hasNext()).isTrue();
+    }
+
+    @Test
+    public void slicePaging(){
+        memberRepository.save(new Member("member1",10));
+        memberRepository.save(new Member("member2",10));
+        memberRepository.save(new Member("member3",10));
+        memberRepository.save(new Member("member4",10));
+        memberRepository.save(new Member("member5",10));
+
+        int age = 10;
+        PageRequest pageRequest = PageRequest.of(0, 3, Sort.by(Sort.Direction.DESC, "username"));
+        //페이지 0부터 시작
+
+        //when
+        Slice<Member> page = memberRepository.findSliceByAge(age, pageRequest);
+        //totalCount쿼리까지 알아서 날려줌 오잉!
+
+        //then
+        List<Member> content = page.getContent(); //내용
+
+        for (Member member : content) {
+            System.out.println("member = " + member);
+        }
+
+        Assertions.assertThat(page.getContent().size()).isEqualTo(3);
+        Assertions.assertThat(page.getNumber()).isEqualTo(0);//페이지 번호 가져옴!
         Assertions.assertThat(page.isFirst()).isTrue();
         Assertions.assertThat(page.hasNext()).isTrue();
     }
