@@ -208,6 +208,15 @@ public class MemberRepositoryTest {
         //when
         Page<Member> page = memberRepository.findByAge(age, pageRequest);
         //totalCount쿼리까지 알아서 날려줌 오잉!
+        //엔티티는 외부에 노출하면 안 됨★★★★★
+        //DTO에 담아서 보내. 그래서 Entity를 안 쓰고 다른 거에 담아서 넘기는구나.
+        //왜냐하면 밖에서 Entity바꾸면?? 그럼 DB는!?
+        // DTO로 쉽게 바꾸는 법
+        Page<MemberDto> map = page.map(m -> new MemberDto(m.getId(), m.getUsername(), null));
+        //이거 map... 함수형에서 썻던 거ㄱ ㅏㅌ네
+
+//        Page<Member> page = memberRepository.findTop3ByAge(age, pageRequest);
+        // 위에서 3건만
 
         //then
         List<Member> content = page.getContent(); //내용

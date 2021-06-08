@@ -64,7 +64,20 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOptionalByUsername(String username); //단건 Optional
     //반환 타입을 유연하게 쓸 수 있도록 스프링 데이터 JPA가 지원해준다
 
+    @Query(value = "select m from Member m left join m.team t",
+            countQuery = "select count(m.username) from Member m")
+    //카운트 쿼리 join 따로. left join. 이렇게 안 하면 count 개 많이 함.
+    //countQuery따로 사용
     Page<Member> findByAge(int age, Pageable pageable);
 
+    @Query(value = "select m from Member m")
+    Page<Member> findPageableByAge(int age, Pageable pageable);
+    //sorting도 마찬가지로 너무 복잡해지면 안 풀릴 수 있음..
+    //그럴 때 그냥 쿼리 날려주는 게 좋음. 근데 그렇게 복잡한 거 쓸 일이 있나.
+
     Slice<Member> findSliceByAge(int age, Pageable pageable);
+
+    //Page안하고 싶고 그냥 데이터 열개만 리스트로 꺼내와라!
+    // List<Member> page = memberRepository.findByAge(age, pageRequest);
+    // 그러면 3개 나오고 끝!
 }
