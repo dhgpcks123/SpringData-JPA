@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 //@RunWith(SpringRunner.class) JUNIT5+ 스프링부트 조합쓰면 필요없음
 @SpringBootTest
 @Transactional
-@Rollback(false)
+@Rollback(value = true)
 class MemberJpaRepositoryTest {
 
     @Autowired MemberJpaRepository memberJpaRepository;
@@ -114,5 +114,20 @@ class MemberJpaRepositoryTest {
         Assertions.assertThat(members.size()).isEqualTo(3);
         Assertions.assertThat(totalCount).isEqualTo(5);
 
+    }
+
+    @Test
+    public void bulkUpdate(){
+        //given
+        memberJpaRepository.save(new Member("member1", 10));
+        memberJpaRepository.save(new Member("member2", 20));
+        memberJpaRepository.save(new Member("member3", 10));
+        memberJpaRepository.save(new Member("member4", 33));
+        memberJpaRepository.save(new Member("member5", 52));
+        //when
+
+        int resultCount = memberJpaRepository.bulkAgePlus(20);
+        //then
+        Assertions.assertThat(resultCount).isEqualTo(3);
     }
 }

@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
@@ -73,11 +74,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query(value = "select m from Member m")
     Page<Member> findPageableByAge(int age, Pageable pageable);
     //sorting도 마찬가지로 너무 복잡해지면 안 풀릴 수 있음..
-    //그럴 때 그냥 쿼리 날려주는 게 좋음. 근데 그렇게 복잡한 거 쓸 일이 있나.
+    //그럴 때 그냥 쿼리 날려주는 게 좋 음. 근데 그렇게 복잡한 거 쓸 일이 있나.
 
     Slice<Member> findSliceByAge(int age, Pageable pageable);
 
     //Page안하고 싶고 그냥 데이터 열개만 리스트로 꺼내와라!
     // List<Member> page = memberRepository.findByAge(age, pageRequest);
     // 그러면 3개 나오고 끝!
+
+    @Modifying
+    @Query("update Member m set m.age = m.age +5 where m.age >= :age")
+    int bulkAgePlus(@Param("age") int age);
 }
