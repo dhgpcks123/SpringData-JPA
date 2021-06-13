@@ -23,7 +23,7 @@ import java.util.Optional;
 
 @SpringBootTest
 @Transactional
-@Rollback(false)
+@Rollback(value = true)
 public class MemberRepositoryTest {
 
     @Autowired MemberRepository memberRepository;
@@ -278,8 +278,11 @@ public class MemberRepositoryTest {
         memberRepository.save(new Member("member5", 52));
         //when
 
-        entityManager.flush();
-        entityManager.clear();
+//        entityManager.flush();
+//        entityManager.clear();
+
+        //이거 안하고 Repository.bulkAgePlus에서
+        //@Modifying(clearAutomatically = true)로 써도 됨.
 
         int resultCount = memberRepository.bulkAgePlus(20);
 
@@ -295,5 +298,65 @@ public class MemberRepositoryTest {
         //벌크형쿼리 쓰기 전에 영속성컨텍스트에꺼 다 날려얗해!
     }
 
+    @Test
+    public void findMemberLazy(){
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
 
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 15, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        entityManager.flush();
+        entityManager.clear();
+        
+        //when
+        List<Member> all = memberRepository.findAll();
+        for (Member member : all) {
+            System.out.println("member.getUsername() = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass());
+            System.out.println("member.team = " + member.getTeam().getName());
+            // team에서 데이터 조회하는데 쿼리 두 번 날림...
+            // member가 10000개면? 쿼리를 10000개 날림.
+            // 그냥 한방에 가져오면 1번만 조인해서 가져오면 되는데...
+            // 이게 바로 N+1 문제라고 합니다. 쿼리 1번 날렸는데 N개 만큼 쿼리 날려!
+            // 네트웤을 N번 왔다갔다;;;
+        }
+        //then
+    }
+    @Test
+    public void findMemberfetchJoin() {
+        //given
+        //member1 -> teamA
+        //member2 -> teamB
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 15, teamB);
+        memberRepository.save(member1);
+        memberRepository.save(member2);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        //when
+        List<Member> all = memberRepository.findMemberFetchJoin();
+        for (Member member : all) {
+            System.out.println("member.getUsername() = " + member.getUsername());
+            System.out.println("member.teamClass = " + member.getTeam().getClass());
+            System.out.println("member.team = " + member.getTeam().getName());
+            // MemberRepository확인
+            //한방에 끌고 아ㅗ서 조회해줌. N+1문제 해결
+        }
+        //then
+    }
 }

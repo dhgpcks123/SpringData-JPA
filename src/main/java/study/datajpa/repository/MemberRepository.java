@@ -3,6 +3,7 @@ package study.datajpa.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import study.datajpa.dto.MemberDto;
 import study.datajpa.entity.Member;
 
+import javax.persistence.Entity;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -82,7 +84,28 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     // List<Member> page = memberRepository.findByAge(age, pageRequest);
     // 그러면 3개 나오고 끝!
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("update Member m set m.age = m.age +5 where m.age >= :age")
     int bulkAgePlus(@Param("age") int age);
+
+    @Query("select m from Member m left join fetch m.team") //JPQL, fetchjoin
+    List<Member> findMemberFetchJoin();
+
+    @Override
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findAll();
+    //새로 정의해서 쓰기 귀찮잖아 이 때 쓰는 게 EntityGraph...
+    //근데 문제가 뭐냐? 같은 findAll()쓰는데 여기는 fetchJoin하고 싶고, 또 다른 곳은 안 하고 싶어.
+    //그럴 땐 그냥 JPQL쓰는 게 나은 것 같은데?
+
+    @EntityGraph(attributePaths = {"team"})
+    @Query("select m from Member m")
+    List<Member> findMemberEntityGraph();
+    //JPQL 쿼리 짯는데!!!! fetch조인 하고 싶어. 이렇게 섞어서도 쓸 수 있음.
+
+    @EntityGraph(attributePaths = {"team"})
+    List<Member> findEntityGraphByUsername(@Param("username") String username);
+    // 회원조회할 때 웬만하면 가지고 오겠다... 그러면 이렇게 쓰는 걸로...
+    // EntityGraph는 JPA에서 제공해줌.
+
 }
