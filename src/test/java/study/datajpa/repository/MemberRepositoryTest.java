@@ -359,4 +359,33 @@ public class MemberRepositoryTest {
         }
         //then
     }
+
+
+    @Test
+    public void queryHint(){
+        //given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        entityManager.flush(); //db에 동기화
+        entityManager.clear();
+
+        //when
+//        Member findMember = memberRepository.findById(member1.getId()).get();
+        Member findMember = memberRepository.findReadOnlyByUsername("member1");
+        findMember.setUsername("member2");
+        //변경이 안 됩니다. readOnly로 Hint줬었잖어...
+//        findMember.setUsername("member2");
+
+        entityManager.flush();
+        //변경하려면 원본이 있어야 해!
+        //스냅샷. 더티체킹. 메모리를 더 먹음. 최적화 되어있어도.
+
+        /*
+        나는 조회만 하고 끝낼꺼야! 나는 변경 안할꺼야!
+        그런데도 스냅샷 가지고 있으면 아깝잖아..... 메모리.. 나는 100%조회용으로만 쓸거야.
+        거기서 사용하는 게 힌트
+         */
+
+        //then
+    }
 }
