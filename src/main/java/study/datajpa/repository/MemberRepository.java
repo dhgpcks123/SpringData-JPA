@@ -54,8 +54,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("select m.username from Member m")
     List<String> findUsernameList();
 
+    //조회해서 바로 dto에 넣기도 하네. 근데 이렇게 쓰나?? 쓸 수는 있겠지만...
     @Query("select new study.datajpa.dto.MemberDto(m.id, m.username, t.name) from Member m join m.team t")
     List<MemberDto> findMemberDto();
+
 
     @Query("select m from Member m where m.username in :names")
     List<Member> findByNames(@Param("names") Collection<String> names);
